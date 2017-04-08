@@ -1,13 +1,73 @@
-require 'sinatra'
-# require 'rubygems'
-require 'Haml'
-require 'json'
-
-get '/' do
-  haml :index
+def github
+  @github ||= GithubApi.new(session[:access_token])
 end
 
-post '/payload' do
-  push = JSON.parse(request.body.read)
-  puts "I got some JSON: #{push.inspect}"
+def authenticated?
+  session[:access_token]
 end
+
+def authenticate!
+  haml :login, locals: { login_url: GithubApi::auth_url }
+end
+
+def repos
+  repos = []
+  github.repos.each do |repo|
+    repo_data = Hash.new
+    repo_data[:full_name] = repo.full_name
+    repo_data[:name] = repo.name
+    repo_data[:owner] = repo.owner
+    repo_data[:id] = repo.id
+    hooks = github.get_hooks(repo.full_name)
+    if hooks
+      puts hooks.inspect
+      # if hooks.first.config.url == ENV["GITHUB_WEBHOOK_CALLBACK"]
+      #   puts "has hook #{repo.name}"
+      # end
+    end
+  end
+end
+
+get "/" do
+  if !authenticated?
+    authenticate!
+  else
+    haml :index, locals: {data: github.user, repos: github.repos}
+  end
+end
+
+get "/hook/:user/:repo" do
+  github.create_hook("#{params[:user]}/#{params[:repo]}", ENV["GITHUB_WEBHOOK_CALLBACK"])
+  redirect "/"
+end
+
+get "/comment/:user/:repo/:pr" do
+
+end
+
+get "/callback" do
+  session[:access_token] = github.token(request.env["rack.request.query_hash"]["code"])
+  redirect "/"
+end
+
+CHANG = "![image](https://media.giphy.com/media/V48T5oWs3agg0/giphy.gif)"
+
+post "/payload" do
+  payload = JSON.parse(request.body.read)
+  if payload["comment"]
+    puts "[#{payload["comment"]["created_at"]}] #{payload["comment"]["user"]["login"]}: #{payload["comment"]["body"]}"
+    if payload["comment"]["body"].downcase().include?("chang")
+      data = Hash.new
+      data[:repo_name] = payload["repository"]["full_name"]
+      data[:pull_request_number] = payload["issue"]["number"]
+      data[:comment_id] = payload["comment"]["id"]
+      data[:comment] = "Hi."
+      github.add_comment(payload["repository"]["full_name"], payload["issue"]["number"], CHANG)
+    end
+  end
+
+  halt 201
+  redirect "/"
+end
+
+
