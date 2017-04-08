@@ -88,7 +88,7 @@ class GithubApi
     client.pull_request_comments(repo_full_name, pull_request_number)
   end
 
-  def add_comment(repo_full_name, pull_request_number, comment)
+  def create_comment(repo_full_name, pull_request_number, comment)
     gifhub_client.add_comment(repo_full_name, pull_request_number, comment)
   end
 
@@ -96,12 +96,12 @@ class GithubApi
     client.pull_request_comment(repo_full_name, comment_id)
   end
 
-  def create_pull_request_comment(options)
-    client.create_pull_request_comment_reply(
-      options[:repo_name],
-      options[:pull_request_number],
-      options[:comment],
-      options[:comment_id]
+  def create_pull_request_comment_reply(repo_full_name, pull_request_id, comment, comment_id)
+    gifhub_client.create_pull_request_comment_reply(
+      repo_full_name,
+      pull_request_id,
+      comment,
+      comment_id
     )
   end
 

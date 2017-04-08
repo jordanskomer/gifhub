@@ -54,15 +54,28 @@ CHANG = "![image](https://media.giphy.com/media/V48T5oWs3agg0/giphy.gif)"
 
 post "/payload" do
   payload = JSON.parse(request.body.read)
+  puts payload.inspect
   if payload["comment"]
     puts "[#{payload["comment"]["created_at"]}] #{payload["comment"]["user"]["login"]}: #{payload["comment"]["body"]}"
     if payload["comment"]["body"].downcase().include?("chang")
       data = Hash.new
       data[:repo_name] = payload["repository"]["full_name"]
-      data[:pull_request_number] = payload["issue"]["number"]
       data[:comment_id] = payload["comment"]["id"]
-      data[:comment] = "Hi."
-      github.add_comment(payload["repository"]["full_name"], payload["issue"]["number"], CHANG)
+      if payload["issue"]
+        data[:pull_request_number] = payload["issue"]["number"]
+        github.create_comment(data[:repo_name], data[:pull_request_number], CHANG)
+      else
+        data[:pull_request_number] = payload["pull_request"]["number"]
+        github.create_pull_request_comment_reply(
+            data[:repo_name],
+            data[:pull_request_number],
+            CHANG,
+            payload["comment"]["id"],
+          )
+      end
+
+      # data = Hash.new
+      # data[:comment] = "Hi."
     end
   end
 
