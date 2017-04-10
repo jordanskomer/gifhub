@@ -88,12 +88,12 @@ class GithubApi
     client.pull_request_comments(repo_full_name, pull_request_number)
   end
 
-  def create_comment(repo_full_name, pull_request_number, comment)
-    gifhub_client.add_comment(repo_full_name, pull_request_number, comment)
-  end
-
   def get_comment(repo_full_name, comment_id)
     client.pull_request_comment(repo_full_name, comment_id)
+  end
+
+  def create_comment(repo_full_name, pull_request_number, comment)
+    gifhub_client.add_comment(repo_full_name, pull_request_number, comment)
   end
 
   def create_pull_request_comment_reply(repo_full_name, pull_request_id, comment, comment_id)
@@ -105,70 +105,7 @@ class GithubApi
     )
   end
 
-  # def pull_request_files(full_repo_name, number)
-  #   client.pull_request_files(full_repo_name, number)
-  # end
-
-  # def file_contents(full_repo_name, filename, sha)
-  #   file_cache["#{full_repo_name}/#{sha}/#{filename}"] ||=
-  #     client.contents(full_repo_name, path: filename, ref: sha)
-  # end
-
-  # def create_pending_status(full_repo_name, sha, description)
-  #   create_status(
-  #     repo: full_repo_name,
-  #     sha: sha,
-  #     state: "pending",
-  #     description: description
-  #   )
-  # end
-
-  # def create_success_status(full_repo_name, sha, description)
-  #   create_status(
-  #     repo: full_repo_name,
-  #     sha: sha,
-  #     state: "success",
-  #     description: description
-  #   )
-  # end
-
-  # def create_error_status(full_repo_name, sha, description, target_url = nil)
-  #   create_status(
-  #     repo: full_repo_name,
-  #     sha: sha,
-  #     state: "error",
-  #     description: description,
-  #     target_url: target_url
-  #   )
-  # end
-
-  # def add_collaborator(repo_name, username)
-  #   client.add_collaborator(
-  #     repo_name,
-  #     username,
-  #     accept: "application/vnd.github.ironman-preview+json",
-  #   )
-  # end
-
-  # def remove_collaborator(repo_name, username)
-  #   # not sure if we need the accept header
-  #   client.remove_collaborator(
-  #     repo_name,
-  #     username,
-  #     accept: "application/vnd.github.ironman-preview+json",
-  #   )
-  # end
-
-  # private
-
-  # def create_status(repo:, sha:, state:, description:, target_url: nil)
-  #   client.create_status(
-  #     repo,
-  #     sha,
-  #     state,
-  #     context: "hound",
-  #     description: description,
-  #     target_url: target_url
-  #   )
-  # end
+  def get_commit(repo_full_name, sha)
+    client.commit(repo_full_name, sha)
+  end
 end

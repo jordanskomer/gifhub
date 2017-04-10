@@ -20,9 +20,6 @@
           %td.name= repo.name
           %td.id= repo.id
           %td
-            - if repo.name == "gifhub"
-              = repo.inspect
-            - else
-              .full-name=repo.full_name
+            .full-name=repo.full_name
           %td
             %a{ href: "/hook/#{repo.full_name}" } Hook It

@@ -53,10 +53,17 @@ end
 CHANG = "![image](https://media.giphy.com/media/V48T5oWs3agg0/giphy.gif)"
 
 post "/payload" do
+  puts request.inspect
   payload = JSON.parse(request.body.read)
-  puts payload.inspect
+  # puts payload.inspect
+  if payload["pull_request"]
+    puts payload["head"].inspect
+    puts github.get_commit(payload["head"]["repo"]["full_name"], payload["head"]["sha"]).inspect
+  end
+
   if payload["comment"]
     puts "[#{payload["comment"]["created_at"]}] #{payload["comment"]["user"]["login"]}: #{payload["comment"]["body"]}"
+
     if payload["comment"]["body"].downcase().include?("chang")
       data = Hash.new
       data[:repo_name] = payload["repository"]["full_name"]
