@@ -50,24 +50,24 @@ get "/callback" do
   redirect "/"
 end
 
-CHANG = "![image](https://media.giphy.com/media/V48T5oWs3agg0/giphy.gif)"
 
 post "/payload" do
-  # puts request.inspect
-  payload = JSON.parse(request.body.read)
-  # puts payload.inspect
+  payload = GithubPayload.new(JSON.parse(request.body.read))
   case retrieve_github_event
   when "pull_request"
-    puts github.get_commit(payload["pull_request"]["head"]["repo"]["full_name"], payload["pull_request"]["merge_commit_sha"]).inspect
+    commit_message = github.get_commit_message(payload.repo_full_name, payload.pull_request_sha)
+    puts "#{payload.created_at} [pull_request]     #{commit_message}"
   when "issue_comment"
-    puts "[#{payload["comment"]["created_at"]}] #{payload["comment"]["user"]["login"]}: #{payload["comment"]["body"]}"
+    puts "#{payload.created_at} [issue_comment]    @#{payload.username}: #{payload.comment}"
+    puts payload.comment
+    github.create_comment(payload.repo_full_name, payload.pull_request_number, "gif goes here")
+  when "pull_request_review_comment"
+
   when nil
     puts "Error"
   end
 
   # if payload["comment"]
-  #   puts "[#{payload["comment"]["created_at"]}] #{payload["comment"]["user"]["login"]}: #{payload["comment"]["body"]}"
-
   #   if payload["comment"]["body"].downcase().include?("chang")
   #     data = Hash.new
   #     data[:repo_name] = payload["repository"]["full_name"]
@@ -89,9 +89,4 @@ post "/payload" do
 
   halt 201
   redirect "/"
-end
-
-
-def retrieve_github_event
-  request.env["HTTP_X_GITHUB_EVENT"] if request
 end

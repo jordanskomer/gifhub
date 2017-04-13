@@ -8,7 +8,7 @@ class GithubApi
   end
 
   def initialize(token)
-    @token = token
+    @token ||= token
   end
 
   def client
@@ -107,5 +107,9 @@ class GithubApi
 
   def get_commit(repo_full_name, sha)
     client.commit(repo_full_name, sha)
+  end
+
+  def get_commit_message(repo_full_name, sha)
+    get_commit(repo_full_name, sha)["commit"]["message"]
   end
 end

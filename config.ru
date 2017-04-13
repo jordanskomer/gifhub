@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'bundler'
 require 'dotenv/load'
+require "./github_payload"
 require "./github_api"
 
 Bundler.require
