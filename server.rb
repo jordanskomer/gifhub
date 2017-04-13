@@ -53,41 +53,45 @@ end
 CHANG = "![image](https://media.giphy.com/media/V48T5oWs3agg0/giphy.gif)"
 
 post "/payload" do
-  puts request.inspect
+  # puts request.inspect
   payload = JSON.parse(request.body.read)
   # puts payload.inspect
-  if payload["pull_request"]
-    puts payload["head"].inspect
-    puts github.get_commit(payload["head"]["repo"]["full_name"], payload["head"]["sha"]).inspect
-  end
-
-  if payload["comment"]
+  case retrieve_github_event
+  when "pull_request"
+    puts github.get_commit(payload["pull_request"]["head"]["repo"]["full_name"], payload["pull_request"]["merge_commit_sha"]).inspect
+  when "issue_comment"
     puts "[#{payload["comment"]["created_at"]}] #{payload["comment"]["user"]["login"]}: #{payload["comment"]["body"]}"
-
-    if payload["comment"]["body"].downcase().include?("chang")
-      data = Hash.new
-      data[:repo_name] = payload["repository"]["full_name"]
-      data[:comment_id] = payload["comment"]["id"]
-      if payload["issue"]
-        data[:pull_request_number] = payload["issue"]["number"]
-        github.create_comment(data[:repo_name], data[:pull_request_number], CHANG)
-      else
-        data[:pull_request_number] = payload["pull_request"]["number"]
-        github.create_pull_request_comment_reply(
-            data[:repo_name],
-            data[:pull_request_number],
-            CHANG,
-            payload["comment"]["id"],
-          )
-      end
-
-      # data = Hash.new
-      # data[:comment] = "Hi."
-    end
+  when nil
+    puts "Error"
   end
+
+  # if payload["comment"]
+  #   puts "[#{payload["comment"]["created_at"]}] #{payload["comment"]["user"]["login"]}: #{payload["comment"]["body"]}"
+
+  #   if payload["comment"]["body"].downcase().include?("chang")
+  #     data = Hash.new
+  #     data[:repo_name] = payload["repository"]["full_name"]
+  #     data[:comment_id] = payload["comment"]["id"]
+  #     if payload["issue"]
+  #       data[:pull_request_number] = payload["issue"]["number"]
+  #       github.create_comment(data[:repo_name], data[:pull_request_number], CHANG)
+  #     else
+  #       data[:pull_request_number] = payload["pull_request"]["number"]
+  #       github.create_pull_request_comment_reply(
+  #           data[:repo_name],
+  #           data[:pull_request_number],
+  #           CHANG,
+  #           payload["comment"]["id"],
+  #         )
+  #     end
+  #   end
+  # end
 
   halt 201
   redirect "/"
 end
 
 
+def retrieve_github_event
+  request.env["HTTP_X_GITHUB_EVENT"] if request
+end
