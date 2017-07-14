@@ -1,0 +1,21 @@
+$fonts: (
+  body_face: "Open Sans",
+  body_base_weight: 400,
+  heading_face: "Open Sans",
+  heading_base_weight: 200,
+  monospace_face: "Andale Mono",
+  monospace_base_weight: 400,
+  bold_weight: 700
+);
+ 
+/// This array defines all of the color placeholders that get generated. i.e. @extend %color-black; 
+$colors: (
+  "black": #000000,
+  "white": #ffffff,
+  "gray": #B3B3B3,
+  "light-gray": #E6E6E6,
+  "dark-gray": #5A5959,
+  "brown": #8D7249
+);
+
+@import "node_modules/the-tailor/tailor";

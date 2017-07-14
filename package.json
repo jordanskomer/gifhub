@@ -7,6 +7,7 @@
   "version": "1.0.0",
   "main": "server.rb",
   "devDependencies": {
+    "browser-sync": "^2.18.12",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.1",
     "gulp-run": "^1.7.1",
