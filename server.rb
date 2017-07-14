@@ -32,7 +32,7 @@ get "/" do
   if !authenticated?
     authenticate!
   else
-    haml :index, locals: {data: github.user, repos: github.repos}
+    haml :index, locals: { user: github.user }
   end
 end
 
