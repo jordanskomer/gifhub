@@ -50,6 +50,14 @@ get "/callback" do
   redirect "/"
 end
 
+# Admin Routes
+get "/admin" do
+  if !authenticated?
+    authenticate!
+  else
+    haml :admin, locals: {data: github.user, repos: github.repos}
+  end
+end
 
 post "/payload" do
   payload = GithubPayload.new(JSON.parse(request.body.read))
