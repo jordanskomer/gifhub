@@ -49,7 +49,7 @@ gulp.task('ngrok', function() {
 
 gulp.task('bsync', function() {
   browserSync.init({
-    files: [['app/assets/stylesheets/**/*.?(s)css', "*.rb"]],
+    files: ['app/assets/stylesheets/**/*.?(s)css', "*.rb"],
     proxy: "localhost:9292"
   });
 });
