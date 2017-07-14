@@ -4,11 +4,7 @@ require "dotenv/load"
 
 Bundler.require
 
-use Rack::Session::Cookie, :key => "rack.session",
-                           :path => "/",
-                           :secret => "your_secret_key_path_thing_for_evan"
-
-set :views, Proc.new { File.join(root, "app/assets/views") }
+require File.dirname(__FILE__) + '/app'
 
 # Load all lib files
 configure do
@@ -18,5 +14,4 @@ configure do
   }
 end
 
-require "./server"
-run Sinatra::Application
+run Gifhub
