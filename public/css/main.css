@@ -119,6 +119,15 @@ i, em {
 b, strong {
   font-weight: 700; }
 
+.btn {
+  color: #ffffff; }
+
+a, .site--header h1.brand span {
+  color: #4cc0da; }
+
+.btn {
+  background-color: #4cc0da; }
+
 .container-fluid, .container {
   margin-right: auto;
   margin-left: auto; }
@@ -1357,3 +1366,46 @@ b, strong {
     -ms-flex-preferred-size: 20%;
     flex-basis: 20%;
     max-width: 20%; } }
+
+.github-info {
+  position: relative; }
+  .github-info .username {
+    float: right;
+    font-weight: bold;
+    display: inline-block;
+    line-height: 40px;
+    padding-left: 1rem; }
+  .github-info .avatar {
+    float: right;
+    line-height: 40px;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-size: cover; }
+  .github-info .logout {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 0; }
+  .github-info:hover .logout {
+    display: inline-block; }
+
+.btn {
+  font-weight: 700;
+  display: inline-block;
+  padding: 1rem 2rem; }
+  .btn.btn-small {
+    padding: .5rem 1rem; }
+  .btn:hover {
+    background-color: #259ab4;
+    text-decoration: none; }
+
+.site--header {
+  border-bottom: 1px solid #E6E6E6;
+  margin-bottom: 2rem;
+  padding: 1rem 0; }
+  .site--header h1.brand {
+    font-size: 30px;
+    margin: 0;
+    padding: 0; }

@@ -1,10 +1,5 @@
-!!!
-%html{:lang => "en"}
-%head
-  %meta{:charset => "UTF-8"}/
-  %title gifhub
-%body
-  %h1 GifHub
-  %a{ href: user[:profile_url] }= user[:username]
-  .class{ style: "width: 50px; height: 50px; background-size: cover; background-image: url(#{user[:avatar]})" }
-  %a{ href: "/logout" } logout
+.row
+  .col-md-2
+    
+  .col-md-10
+    %h2 Your Gif Awesomeness!

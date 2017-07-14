@@ -13,7 +13,7 @@ const cssFiles = [
 ];
 
 const jsFiles = [
-  'app/assets/js/main.js',
+  'app/assets/js/*.js',
 ];
 
 gulp.task('css', () => {
@@ -50,7 +50,12 @@ gulp.task('ngrok', function() {
 
 gulp.task('bsync', function() {
   browserSync.init({
-    files: ['app/assets/stylesheets/**/*.?(s)css', "*.rb"],
+    files: [
+      'app/assets/stylesheets/**/*.?(s)css',
+      'app/assets/js/*.js',
+      'app/views/*.haml',
+      'app/views/**/*.haml',
+    ],
     proxy: "localhost:9292"
   });
 });
@@ -58,8 +63,12 @@ gulp.task('bsync', function() {
 gulp.task('serve', function() {
   gulp.start('rackup');
   gulp.start('ngrok');
+  gulp.start('watch');
+});
+
+gulp.task('watch', function() {
   gulp.watch(cssFiles, ['css']);
   gulp.watch(jsFiles, ['scripts']);
 });
 
-gulp.task('default', ['css', 'scripts', 'serve']);
+gulp.task('default', ['watch', 'bsync']);

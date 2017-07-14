@@ -1,0 +1,20 @@
+!!!
+%html{:lang => "en"}
+%head
+  %meta{:charset => "UTF-8"}/
+  %title gifhub
+%body
+  .container
+    %header.site--header.row
+      .col-xs-10
+        %h1.brand <span>gif</span>Hub
+      .col-xs-2
+        .github-info
+          %a{ href: user[:profile_url] }
+            %strong.username= user[:username]
+            .avatar{ style: "background-image: url(#{user[:avatar]})" }
+          %a.btn.btn-small.logout{ href: "/logout" } Logout
+      
+    = yield
+
+  %link{:rel => :stylesheet, :type => :"text/css", :href => "css/main.css"} 
