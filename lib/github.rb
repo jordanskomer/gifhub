@@ -1,4 +1,4 @@
-class GithubApi
+class Github
   CLIENT_ID = ENV["GITHUB_CLIENT_ID"]
   CLIENT_SECRET = ENV["GITHUB_CLIENT_SECRET"]
   GIFHUB_USER_TOKEN = ENV["GITHUB_GIFHUB_USER_TOKEN"]
@@ -7,8 +7,13 @@ class GithubApi
     Octokit::Client.new.authorize_url(CLIENT_ID)
   end
 
+  def self.verify_webhook_signature(payload, payload_signature)
+    signature = "sha1=" + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new("sha1"), ENV["WEBHOOK_SECRET"], payload)
+    Rack::Utils.secure_compare(signature, payload_signature) ? JSON.parse(payload) : false
+  end
+
   def initialize(token)
-    @token ||= token
+    @token = token
   end
 
   def client
@@ -34,6 +39,11 @@ class GithubApi
     data
   end
 
+  def installation(installation_id=nil)
+    id = installation_id.present? ? installation_id : ENV["APP_ID"]
+    client.installation(id)
+  end
+
   def repos
     client.repos
   end
@@ -53,14 +63,13 @@ class GithubApi
     false
   end
 
-  def create_hook(full_repo_name, callback_endpoint)
+  def create_hook(full_repo_name)
     hook = client.create_hook(
       full_repo_name,
       "web",
-      { url: callback_endpoint, content_type: "json"},
+      { url: "#{ENV["HOST"]}/payload", content_type: "json" },
       { events: ["commit_comment", "issue_comment", "pull_request_review_comment", "pull_request"], active: true }
     )
-
     if block_given?
       yield hook
     else

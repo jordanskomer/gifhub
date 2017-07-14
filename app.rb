@@ -72,6 +72,6 @@ class Gifhub < Sinatra::Base
   get "/callback", &recieve_callback
   get "/logout", &logout
   get "/admin", &admin_login
-  get "/payload", &recieve_payload
+  post "/payload", &recieve_payload
 
 end

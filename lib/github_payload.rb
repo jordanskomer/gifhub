@@ -1,6 +1,7 @@
 class GithubPayload
   def initialize(payload)
-    @payload = payload
+    verify_webhook_signature(payload)
+    @payload = JSON.parse(payload)
   end
 
   def payload_type
@@ -63,5 +64,10 @@ class GithubPayload
     elsif comment?
       @payload["issue"]["number"]
     end
+  end
+
+  def verify_webhook_signature(payload)
+    signature = 'sha1=' + OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'), ENV['WEBHOOK_SECRET'], payload)
+    return halt 500, "Signatures didn't match!" unless Rack::Utils.secure_compare(signature, request.env['HTTP_X_HUB_SIGNATURE'])
   end
 end
