@@ -4,22 +4,5 @@
   %meta{:charset => "UTF-8"}/
   %title gifhub
 %body
-  %h1 GifHub
-  %a{ href: data[:profile_url] }= data[:username]
-  .class{ style: "width: 50px; height: 50px; background-size: cover; background-image: url(#{data[:avatar]})" }
-  %table
-    %thead
-      %tr
-        %th Name
-        %th Id
-        %th Full Name
-        %th
-    %tbody
-      - repos.each do |repo|
-        %tr.repo
-          %td.name= repo.name
-          %td.id= repo.id
-          %td
-            .full-name=repo.full_name
-          %td
-            %a{ href: "/hook/#{repo.full_name}" } Hook It
+  %h1 GifHub Admin
+  

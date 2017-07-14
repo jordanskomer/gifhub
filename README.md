@@ -7,6 +7,14 @@
 
 ## Running Locally
 
+1. Run `yarn install`
+
+2. Run `gulp`
+
+3. Make improvements!
+
+The previous, much more complicated setup [COUGH]Jordan[/COUGH]
+
 1. Run `rackup`
 
 2. Create an ngrok tunnel to your local on port 9292 `ngrok http 9292`

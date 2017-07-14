@@ -40,7 +40,7 @@ gulp.task('ngrok', function() {
     addr: 9292,
   }, function (err, url) {
     console.log('-------------------------------------');
-    console.log('NGROK: '+ url);
+    console.log('NGROK URL: '+ url);
     console.log('-------------------------------------');
 
     gulp.start('bsync');
@@ -49,7 +49,7 @@ gulp.task('ngrok', function() {
 
 gulp.task('bsync', function() {
   browserSync.init({
-    files: [cssFiles],
+    files: [['app/assets/stylesheets/**/*.?(s)css', "*.rb"]],
     proxy: "localhost:9292"
   });
 });
