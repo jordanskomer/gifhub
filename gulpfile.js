@@ -8,7 +8,8 @@ const ngrok = require('ngrok');
 const browserSync = require('browser-sync').create();
 
 const cssFiles = [
-  'app/assets/stylesheets/**/*.?(s)css'
+  'app/assets/stylesheets/**/*.?(s)css',
+  'app/assets/stylesheets/*.?(s)css'
 ];
 
 const jsFiles = [
