@@ -59,6 +59,11 @@ get "/admin" do
   end
 end
 
+get "/logout" do
+  session[:access_token] = nil
+  redirect "/"
+end
+
 post "/payload" do
   payload = GithubPayload.new(JSON.parse(request.body.read))
   case retrieve_github_event

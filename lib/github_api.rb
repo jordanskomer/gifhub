@@ -4,7 +4,7 @@ class GithubApi
   GIFHUB_USER_TOKEN = ENV["GITHUB_GIFHUB_USER_TOKEN"]
 
   def self.auth_url
-    Octokit::Client.new.authorize_url(CLIENT_ID, scope: ENV["GITHUB_WEBHOOK_SCOPE"])
+    Octokit::Client.new.authorize_url(CLIENT_ID)
   end
 
   def initialize(token)
