@@ -1,0 +1,15 @@
+.btn {
+  @extend %background-color-primary, %color-white;
+  font-weight: map-get($fonts, bold_weight);
+  display: inline-block;
+  padding: 1rem 2rem;
+
+  &.btn-small {
+    padding: .5rem 1rem;
+  }
+
+  &:hover {
+    background-color: darken(map-get($colors, "primary"), 15%);
+    text-decoration: none;
+  }
+}

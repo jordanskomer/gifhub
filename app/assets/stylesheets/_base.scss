@@ -1,0 +1,38 @@
+a {
+  @extend %color-primary;
+}
+
+.github-info {
+  $line-height: 40px;
+  position: relative;
+
+  .username {
+    float: right;
+    font-weight: bold;
+    display: inline-block;
+    line-height: $line-height;
+    padding-left: 1rem;
+  }
+
+  .avatar {
+    float: right;
+    line-height: $line-height;
+    display: inline-block;
+    width: $line-height;
+    height: $line-height;
+    border-radius: 50%; 
+    background-size: cover;
+  }
+
+  .logout {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    // transform: translateX(-50%);
+  }
+
+  &:hover .logout {
+    display: inline-block;
+  }
+}
