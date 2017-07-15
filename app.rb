@@ -1,5 +1,3 @@
-require 'sinatra/base'
-
 class Gifhub < Sinatra::Base
   set :root, File.dirname(__FILE__)
   set :views, Proc.new { File.join(root, "app/assets/views/") }
@@ -9,7 +7,7 @@ class Gifhub < Sinatra::Base
   # Methods
   # --------
   def github
-    @github ||= Github.new(session[:access_token])
+    @github ||= Github::Client.new(session[:access_token])
   end
 
   def authenticated?
@@ -17,7 +15,7 @@ class Gifhub < Sinatra::Base
   end
 
   def authenticate!
-    haml :login, locals: { login_url: Github.auth_url }
+    haml :login, locals: { login_url: Github::Base.auth_url }
   end
 
   # Lambdas
@@ -26,7 +24,7 @@ class Gifhub < Sinatra::Base
     if !authenticated?
       authenticate!
     else
-      haml :index, locals: { user: github.user }
+      haml :index, locals: { user:  github.user_info }
     end
   end
 
@@ -35,35 +33,15 @@ class Gifhub < Sinatra::Base
     redirect "/"
   end
 
-  admin_login = lambda do
-    if !authenticated?
-      authenticate!
-    else
-      haml :admin, locals: {data: github.user, repos: github.repos}
-    end
-  end
-
   recieve_callback = lambda do
-    session[:access_token] = github.token(request.env["rack.request.query_hash"]["code"])
+    session[:access_token] = Github::Base.retrieve_access_token(request.env["rack.request.query_hash"]["code"])
     redirect "/"
   end
 
   recieve_payload = lambda do
-    request.body.rewind
-    payload_body = request.body.read
-    payload = Github.verify_webhook_signature(payload_body, request.env["HTTP_X_HUB_SIGNATURE"])
-    if payload
-      if payload["installation"] && payload["repositories"]
-        payload["repositories"].each do |repo|
-          puts "hooking into #{repo["full_name"]}"
-          puts github.inspect
-          github.create_hook(repo["full_name"])
-        end
-      end
-    end
-
-    halt 201
-    redirect "/"
+    payload = Github::Payload.new(request)
+    puts payload.inspect
+    # github.create_comment("jordanskomer/gifhub", "3", "Test")
   end
 
   # Routes
@@ -71,7 +49,6 @@ class Gifhub < Sinatra::Base
   get "/", &login
   get "/callback", &recieve_callback
   get "/logout", &logout
-  get "/admin", &admin_login
   post "/payload", &recieve_payload
 
 end

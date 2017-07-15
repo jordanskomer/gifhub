@@ -1,17 +1,13 @@
 require "rubygems"
 require "bundler"
 require "dotenv/load"
+require "sinatra/base"
 
 Bundler.require
 
-require File.dirname(__FILE__) + '/app'
+require File.dirname(__FILE__) + "/app"
 
 # Load all lib files
-configure do
-  $LOAD_PATH.unshift("#{File.dirname(__FILE__)}/lib")
-  Dir.glob("#{File.dirname(__FILE__)}/lib/*.rb") { |lib|
-    require File.basename(lib, '.*')
-  }
-end
+Dir.glob(File.dirname(__FILE__) + "/lib/**/*.rb") { |f| require_relative f }
 
 run Gifhub
