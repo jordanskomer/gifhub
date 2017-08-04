@@ -8,6 +8,7 @@ gem "dotenv"
 # Front-end
 gem "haml"
 gem "json"
+gem "faye-websocket"
 
 # Github API
 gem "rest-client"
@@ -19,3 +20,7 @@ gem "pg"
 gem "activerecord"
 gem "sinatra-activerecord"
 gem "rake"
+
+group :development do
+  gem "tux"
+end

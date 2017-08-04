@@ -1,41 +1,52 @@
-require "openssl"
-require "jwt"
-
 module Github
-  class Client < Github::Base
+  class Client
+    include Github::Payload
 
-    def initialize(token)
-      puts token
-      @token ||= token
+    def initialize(request)
+      @request = request
     end
 
-    def client
-      @client ||= Octokit::Client.new(access_token: @token, auto_paginate: true)
-    end
-
-    def bot_client
-      @bot_client ||= Octokit::Client.new(access_token: installation_access_token, auto_paginate: true)
-    end
-
-    def user_info
-      data = Hash.new
-      puts client.user.inspect
-      data[:username] = client.user.login
-      data[:email] = client.user.email
-      data[:location] = client.user.location
-      data[:avatar] = client.user.avatar_url
-      data[:profile_url] = client.user.html_url
-      data
+    # create_comment
+    # ------------------------------------------
+    # Creates the appropriate gif comment based on the payload
+    def create_comment
+      create_pull_request_comment_reply if pull_request_review_comment?
+      add_comment if issue_comment?
     end
 
     private
 
-    def installation_access_token
-      Octokit::Client.new(bearer_token: private_key).create_installation_access_token(installation_id)[:token]
+    def add_comment
+      puts "| !!!   #{repo_full_name}, #{pull_request_number}, #{gif.keyword}"
+      client.add_comment(repo_full_name, pull_request_number, "![image](#{gif.url})") if gif.present?
     end
 
-    def installation_id
-      @installation_id ||= 39509
+    def create_pull_request_comment_reply
+      puts "| !!!   #{repo_full_name}, #{pull_request_number}, #{gif.keyword}, #{comment_id}"
+      if gif.present?
+        client.create_pull_request_comment_reply(
+          repo_full_name,
+          pull_request_number,
+          "![image](#{gif.url})",
+          comment_id,
+        )
+      end
+    end
+
+    def gif
+      # on_merge Activation Gifs
+      Github::Gifs.new(comment).merge_on_merge if merged?
+      Github::Gifs.new(comment).squerge_on_merge if squerged?
+      # instant Activation Gifs
+      Github::Gifs.new(comment).comment_instant if comment?
+    end
+
+    def client
+      @client ||= Octokit::Client.new(access_token: installation_access_token, auto_paginate: true)
+    end
+
+    def installation_access_token
+      Octokit::Client.new(bearer_token: private_key).create_installation_access_token(installation_id)[:token]
     end
 
     def private_key
@@ -45,7 +56,7 @@ module Github
       payload = {
         iat: Time.now.to_i,
         exp: Time.now.to_i + (8 * 60),
-        iss: APP_ID
+        iss: APP_ID,
       }
       JWT.encode(payload, private_key, "RS256")
     end

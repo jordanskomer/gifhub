@@ -1,21 +1,21 @@
 class Gifhub < Sinatra::Base
   set :root, File.dirname(__FILE__)
-  set :views, Proc.new { File.join(root, "app/assets/views/") }
+  set :views, Proc.new { File.join(root, "app/views/") }
 
   enable :sessions
 
   # Methods
   # --------
-  def github
-    @github ||= Github::Client.new(session[:access_token])
-  end
+  # def github
+  #   @github ||= Github::Client.new(session[:access_token])
+  # end
 
   def authenticated?
     session[:access_token]
   end
 
   def authenticate!
-    haml :login, locals: { login_url: Github::Base.auth_url }
+    haml :login, locals: { login_url: Github.auth_url }
   end
 
   # Lambdas
@@ -24,7 +24,7 @@ class Gifhub < Sinatra::Base
     if !authenticated?
       authenticate!
     else
-      haml :index, locals: { user:  github.user_info }
+      haml :index
     end
   end
 
@@ -33,22 +33,28 @@ class Gifhub < Sinatra::Base
     redirect "/"
   end
 
+  setup_user = lambda do
+    params[:installation_id]
+    redirect "/"
+  end
+
   recieve_callback = lambda do
-    session[:access_token] = Github::Base.retrieve_access_token(request.env["rack.request.query_hash"]["code"])
+    session[:access_token] = Github.retrieve_access_token(request.env["rack.request.query_hash"]["code"])
     redirect "/"
   end
 
   recieve_payload = lambda do
-    payload = Github::Payload.new(request)
-    puts payload.inspect
-    # github.create_comment("jordanskomer/gifhub", "3", "Test")
+    github = Github::Client.new(request)
+    User.create(github.user) if github.installing?
+    github.create_comment
+    halt 200
   end
 
   # Routes
   # --------
   get "/", &login
-  get "/callback", &recieve_callback
   get "/logout", &logout
+  get "/setup", &setup_user
+  get "/callback", &recieve_callback
   post "/payload", &recieve_payload
-
 end
