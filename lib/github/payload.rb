@@ -1,9 +1,5 @@
 module Github
   module Payload
-    def payload
-      @payload ||= verify_webhook_signature(payload_body, @request.env["HTTP_X_HUB_SIGNATURE"])
-    end
-
     def installing?
       installation? && action == "created"
     end
@@ -34,10 +30,6 @@ module Github
 
     def pull_request_closed?
       pull_request? && action == "closed"
-    end
-
-    def comment?
-      issue_comment? || pull_request_review_comment?
     end
 
     def issue_comment?
@@ -109,6 +101,10 @@ module Github
     end
 
     private
+
+    def payload
+      @payload ||= verify_webhook_signature(payload_body, @request.env["HTTP_X_HUB_SIGNATURE"])
+    end
 
     def payload_body
       @payload_body ||= @request.body.read
