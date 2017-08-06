@@ -92,6 +92,10 @@ module Github
       payload["pull_request"]["base"]["ref"]
     end
 
+    def files
+
+    end
+
     def action
       payload["action"]
     end
