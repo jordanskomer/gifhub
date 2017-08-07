@@ -30,9 +30,9 @@ module Github
       if branch?
         puts "| ---   branch"
         comment = Gif.where(github_type: "branch").detect { |gif| head_branch.downcase.include? gif.keyword.downcase }
-        unless gif
-          comment = Gif.find_by_github_type("merge") if merge?
-          comment = Gif.find_by_github_type("squerge") if squerge?
+        unless comment
+          comment = Gif.find_by(github_type: "merge") if merged?
+          comment = Gif.find_by(github_type: "squerge") if squerged?
         end
         add_comment(comment.image) if comment.present?
       end
