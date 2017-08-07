@@ -2,20 +2,20 @@ module Github
   class Gifs
     # initialize
     # ------------------------------------------
-    # Sanitize comment for gif matching
+    # Sanitize keyword for gif matching
     # Called from Github::Client
     #
     # == Arguments
-    # comment - String - The comment retrieved from the Github payload
-    def initialize(comment)
-      @comment = comment.downcase
+    # keyword - String - The keyword retrieved from the Github payload
+    def initialize(keywords)
+      @keywords = keywords
     end
 
     # method_missing
     # ------------------------------------------
     # Override the method missing to dynamically create methods
     # that correspond to the github_types and activation methods in the DB
-    def method_missing(meth, *args, &block)
+    def method_missing(meth, *_args, &_block)
       args = meth.to_s.split("_", 2)
       find_gif(Gif.where(github_type: args[0], activate: args[1]))
     end
@@ -24,7 +24,7 @@ module Github
 
     # find_gif
     # ------------------------------------------
-    # Returns a gif object if it matches the comment
+    # Returns a gif object if it matches the keyword
     #
     # == Arguments
     # objects - Object - The DB query of gifs
@@ -34,10 +34,10 @@ module Github
 
     # match?
     # ------------------------------------------
-    # Returns true if the keywords matches the @comment
+    # Returns true if the keywords matches the @keyword
     # Note: Both strings have been sanitized for case insensitivity
-    def match?(keyword)
-      @comment.include? keyword.downcase
+    def match?(gif_keyword)
+      @keywords.detect { |keyword| keyword.downcase.include? gif_keyword.downcase }
     end
   end
 end
