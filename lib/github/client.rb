@@ -10,35 +10,65 @@ module Github
     # ------------------------------------------
     # Creates the appropriate gif comment based on the payload
     def create_comment
-      create_pull_request_comment_reply if pull_request_review_comment?
-      add_comment if issue_comment?
+      if file?
+        puts "| ---   file"
+        files.each do |file|
+          comment = Gif.where(github_type: "file").detect { |gif| file[:filename].downcase.include? gif.keyword.downcase }
+          create_pull_request_comment(comment.image, file.filename, 1) if comment.present?
+        end
+      end
+
+      if comment?
+        puts "| ---   comment"
+        testies = Gif.where(github_type: "comment").detect { |gif| comment.downcase.include? gif.keyword.downcase }
+        if testies.present?
+          add_comment(testies.image) if issue_comment?
+          create_pull_request_comment_reply(testies.image) if pull_request_review_comment?
+        end
+      end
+
+      if branch?
+        puts "| ---   branch"
+        comment = Gif.where(github_type: "branch").detect { |gif| head_branch.downcase.include? gif.keyword.downcase }
+        unless gif
+          comment = Gif.find_by_github_type("merge") if merge?
+          comment = Gif.find_by_github_type("squerge") if squerge?
+        end
+        add_comment(comment.image) if comment.present?
+      end
     end
 
     private
 
-    def add_comment
-      puts "| !!!   #{repo_full_name}, #{pull_request_number}, #{gif.keyword}"
-      client.add_comment(repo_full_name, pull_request_number, "![image](#{gif.url})") if gif.present?
+    def add_comment(comment)
+      puts "|       add_comment #{comment}"
+      client.add_comment(repo_full_name, pull_request_number, comment)
     end
 
-    def create_pull_request_comment_reply
-      puts "| !!!   #{repo_full_name}, #{pull_request_number}, #{gif.keyword}, #{comment_id}"
-      if gif.present?
-        client.create_pull_request_comment_reply(
+    def create_pull_request_comment(comment, file_path, position)
+      puts "|       create_pull_request_comment #{comment}"
+      client.create_pull_request_comment(
           repo_full_name,
           pull_request_number,
-          "![image](#{gif.url})",
-          comment_id,
+          comment,
+          pull_request_sha,
+          file_path,
+          position
         )
-      end
     end
 
-    def gif
-      # on_merge Activation Gifs
-      Github::Gifs.new(comment).merge_on_merge if merged?
-      Github::Gifs.new(comment).squerge_on_merge if squerged?
-      # instant Activation Gifs
-      Github::Gifs.new(comment).comment_instant if comment?
+    def create_pull_request_comment_reply(comment)
+      puts "|       create_pull_request_comment_reply #{comment}"
+      client.create_pull_request_comment_reply(
+        repo_full_name,
+        pull_request_number,
+        comment,
+        comment_id,
+      )
+    end
+
+    def files
+      @files ||= client.pull_request_files(repo_full_name, pull_request_number)
     end
 
     def client

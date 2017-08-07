@@ -12,4 +12,8 @@
 
 class Gif < ActiveRecord::Base
   belongs_to :user
+
+  def image
+    "![image](#{url})"
+  end
 end
