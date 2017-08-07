@@ -3,7 +3,7 @@ require "bundler"
 require "dotenv/load"
 require "sinatra/base"
 require "sinatra/activerecord"
-# require "./config/environments"
+require "./app.rb"
 Bundler.require
 
 require File.dirname(__FILE__) + "/app"
